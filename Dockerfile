@@ -1,7 +1,7 @@
 # Vanara.ai backend — production image
 # Pure-Python deps only (xhtml2pdf + PyPDF2 for PDF); no native libs needed.
 
-FROM python:3.11-slim AS base
+FROM python:3.14-slim AS base
 
 WORKDIR /app
 
