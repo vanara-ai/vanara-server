@@ -25,4 +25,4 @@ deepdiff==8.5.0
 supabase==2.15.2
 
 # Env loading (local dev)
-python-dotenv==1.1.0
+python-dotenv==1.2.2
