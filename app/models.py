@@ -75,13 +75,17 @@ class ProjectItem(BaseModel):
 
 
 class Resume(BaseModel):
-    summary: str
+    summary: str | None = ""
     contact_info: ContactInfo
     skills: list[SkillCategory]
     certifications: list[Certification]
     professional_experience: list[ExperienceItem]
     education: list[EducationItem]
     projects: list[ProjectItem]
+
+    @field_validator("summary", mode="before")
+    def coerce_summary_none(cls, v):
+        return v or ""
 
 
 class SummaryInstructions(BaseModel):
@@ -116,21 +120,21 @@ class ProfessionalExperienceInstructions(BaseModel):
     job_specific_instructions: list[JobSpecificInstruction] = Field(default_factory=list)
     overall_improvements: list[str] = Field(default_factory=list)
     experience_ordering: list[str] = Field(default_factory=list)
-    actionable_steps: list[str] = Field(default_factory=list)
+    actionable_steps: list[str] | None = None
 
 
 class EducationInstructions(BaseModel):
-    formatting_requirements: list[str] = Field(
-        default_factory=list, description="Formatting requirements derived from job description"
+    formatting_requirements: list[str] | None = Field(
+        default=None, description="Formatting requirements derived from job description"
     )
-    actionable_steps: list[str] = Field(default_factory=list)
+    actionable_steps: list[str] | None = None
 
 
 class ProjectSpecificInstruction(BaseModel):
     project_name: str
     alignment_issues: list[str] = Field(default_factory=list)
     missing_technologies: list[str] = Field(default_factory=list)
-    missing_outcomes: list[str] = Field(default_factory=list)
+    missing_outcomes: list[str] | None = None
     description_improvements: list[str] = Field(default_factory=list)
 
 
@@ -143,15 +147,13 @@ class ProjectsInstructions(BaseModel):
 
 
 class SectionInstructions(BaseModel):
-    summary: SummaryInstructions = Field(default_factory=SummaryInstructions)
-    # contact_info: ContactInfoInstructions = Field(default_factory=ContactInfoInstructions)
-    skills: SkillsInstructions = Field(default_factory=SkillsInstructions)
-    # certifications: CertificationsInstructions = Field(default_factory=CertificationsInstructions)
-    professional_experience: ProfessionalExperienceInstructions = Field(
-        default_factory=ProfessionalExperienceInstructions
-    )
-    education: EducationInstructions = Field(default_factory=EducationInstructions)
-    projects: ProjectsInstructions = Field(default_factory=ProjectsInstructions)
+    summary: SummaryInstructions | None = None
+    # contact_info: ContactInfoInstructions | None = None
+    skills: SkillsInstructions | None = None
+    # certifications: CertificationsInstructions | None = None
+    professional_experience: ProfessionalExperienceInstructions | None = None
+    education: EducationInstructions | None = None
+    projects: ProjectsInstructions | None = None
 
 
 class ScoreBreakdown(BaseModel):
@@ -172,7 +174,7 @@ class ATSScoreOutput(BaseModel):
     strengths: list[str]
     weaknesses: list[str]
     section_instructions: SectionInstructions = Field(default_factory=SectionInstructions)
-    model_config = {"extra": "forbid"}
+    model_config = {"extra": "ignore"}
 
 
 # Database Models
