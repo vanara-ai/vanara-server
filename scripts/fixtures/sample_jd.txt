@@ -1,0 +1,31 @@
+Data Engineer - Senior Level
+
+We are seeking a Senior Data Engineer to join our growing analytics team. You will be responsible for designing, building, and maintaining scalable data pipelines that power our business intelligence platform.
+
+Required Qualifications:
+- 5+ years of experience in data engineering or a related field
+- Strong proficiency in Python and SQL
+- Hands-on experience with cloud platforms (AWS, GCP, or Azure)
+- Experience with Apache Airflow for workflow orchestration
+- Proficiency with Snowflake or similar cloud data warehouses
+- Experience with dbt for data transformations
+- Bachelor's degree in Computer Science, Engineering, or related field
+  OR equivalent practical experience (8+ years)
+
+Preferred Qualifications:
+- Experience with Databricks and Apache Spark
+- Knowledge of Kafka or other streaming platforms
+- Familiarity with Fivetran, Stitch, or similar ELT tools
+- Experience with Tableau or Looker for BI
+- Master's degree in a quantitative field
+
+Key Responsibilities:
+- Design and implement end-to-end data pipelines using Python, SQL, and Airflow
+- Build and maintain dimensional models in Snowflake using dbt
+- Collaborate with data scientists and analysts to deliver clean, reliable datasets
+- Optimize query performance and data warehouse costs
+- Mentor junior engineers and establish engineering best practices
+- Implement data quality monitoring and alerting
+
+About Us:
+We are a fast-growing SaaS company in the fintech industry with 500+ employees. Remote-friendly with hybrid options in NYC and SF. We value ownership, continuous learning, and technical excellence.

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/vanara-ai/vanara-server/security/advisories/new
+    about: Please report security issues privately via GitHub Security Advisories.
+  - name: Frontend issues
+    url: https://github.com/vanara-ai/vanara-serverui/issues
+    about: For UI bugs or frontend feature requests, file there.

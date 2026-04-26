@@ -1,0 +1,28 @@
+# Core web framework
+fastapi==0.115.12
+uvicorn==0.34.2
+python-multipart==0.0.20
+
+# LLM / agent stack (all providers reachable through the OpenAI-compatible
+# ChatOpenAI client — we target Groq via base_url, no OpenAI key required).
+langchain-core==0.3.61
+langchain-openai==0.3.18
+langgraph==0.4.7
+
+# PDF rendering (pure-Python, no native deps)
+xhtml2pdf==0.2.11
+PyPDF2==3.0.1
+jinja2==3.1.6
+
+# Data / validation
+pydantic[email]==2.11.4
+python-dateutil==2.9.0.post0
+deepdiff==8.5.0
+
+# Optional: Supabase-backed persistence (history + feedback). If the
+# SUPABASE_URL / SUPABASE_KEY env vars are unset the backend runs
+# stateless and these remain idle.
+supabase==2.15.2
+
+# Env loading (local dev)
+python-dotenv==1.1.0

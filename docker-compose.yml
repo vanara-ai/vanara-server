@@ -1,0 +1,31 @@
+# Local development — spin up the backend with `docker compose up --build`.
+#
+# Supabase is intentionally not included. BYOK runs fully stateless without
+# a database. If you want history/feedback persistence, point SUPABASE_URL +
+# SUPABASE_KEY at a real Supabase project (free tier works fine).
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+      # Comma-separated origins your frontend runs on
+      CORS_ORIGINS: "http://localhost:3000"
+      # Optional: uncomment and set for persistence mode
+      # SUPABASE_URL: ${SUPABASE_URL}
+      # SUPABASE_KEY: ${SUPABASE_KEY}
+      # Optional: feedback email delivery
+      # SMTP_SERVER: ${SMTP_SERVER}
+      # SMTP_PORT: ${SMTP_PORT}
+      # SMTP_USERNAME: ${SMTP_USERNAME}
+      # SMTP_PASSWORD: ${SMTP_PASSWORD}
+      # FROM_EMAIL: ${FROM_EMAIL}
+      # TO_EMAIL: ${TO_EMAIL}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

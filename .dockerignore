@@ -1,0 +1,38 @@
+# Build artifacts / caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets & local config
+.env
+.env.local
+*.key
+
+# Version control
+.git/
+.gitignore
+.github/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Tests (not needed in production image)
+tests/
+
+# Documentation (not needed in runtime image)
+*.md
+LICENSE
+docker-compose.yml
+Dockerfile
+.dockerignore

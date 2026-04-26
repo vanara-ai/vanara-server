@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a new capability or endpoint
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Please describe what you'd like to see and why.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Include API sketch, payload shape, or flow diagram if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Design principles (please confirm)
+      options:
+        - label: This feature does NOT require persisting the Groq API key server-side
+          required: true
+        - label: This feature works with or without Supabase configured (or explicitly requires it)
+          required: true
+        - label: No new PII is logged or persisted without explicit user consent
+          required: true

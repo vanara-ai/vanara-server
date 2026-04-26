@@ -1,0 +1,53 @@
+# Vanara.ai backend — tooling configuration.
+# The app itself is installed via requirements.txt (pip-style). This file
+# exists so ruff / black / pytest find a consistent config root.
+
+[project]
+name = "vanara-ai-backend"
+version = "1.0.0"
+description = "Open-source BYOK resume optimizer backend (FastAPI + LangGraph)."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+
+[tool.ruff]
+# Python version to target.
+target-version = "py311"
+line-length = 120
+
+# Directories ruff should scan by default.
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+# Enabled rule families:
+#   E, W   — pycodestyle
+#   F      — pyflakes (undefined names, unused imports)
+#   I      — isort (import order)
+#   B      — flake8-bugbear (common bug patterns)
+#   UP     — pyupgrade (modernize syntax)
+#   C4     — flake8-comprehensions
+#   SIM    — flake8-simplify
+select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM"]
+
+# Rules to ignore:
+#   E501 — line too long (handled by line-length setting + auto-wrap)
+#   B008 — function calls in defaults (FastAPI uses this heavily: Depends(), Query(), etc.)
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use assert, unused fixtures, and long strings freely.
+"tests/**/*.py" = ["B011", "F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
