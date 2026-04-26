@@ -22,7 +22,7 @@ deepdiff==8.5.0
 # Optional: Supabase-backed persistence (history + feedback). If the
 # SUPABASE_URL / SUPABASE_KEY env vars are unset the backend runs
 # stateless and these remain idle.
-supabase==2.15.2
+supabase==2.29.0
 
 # Env loading (local dev)
 python-dotenv==1.1.0
