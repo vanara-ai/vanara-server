@@ -15,6 +15,7 @@ from langgraph.pregel import RetryPolicy
 from langgraph.types import CachePolicy
 
 from .logger import logger
+from .llm_retry import invoke_with_retry
 from .models import JD, ATSScoreOutput, Resume
 
 # Configuration — all models hosted on Groq (single-provider BYOK).
@@ -471,18 +472,20 @@ class ResumeOptimizer:
             )
 
             chain = prompt | self.score_llm.with_structured_output(ATSScoreOutput, method="json_schema")
-            feedback_obj = chain.invoke(
-                {
-                    "required_skills": state["jd_structured"].get("required_skills", []),
-                    "preferred_skills": state["jd_structured"].get("preferred_skills", []),
-                    "experience_requirements": state["jd_structured"].get("experience_requirements", []),
-                    "education_requirements": state["jd_structured"].get("education_requirements", []),
-                    "key_responsibilities": state["jd_structured"].get("key_responsibilities", []),
-                    "company_info": state["jd_structured"].get("company_info", {}),
-                    "resume": state["current_resume"],
-                    "previous_score": state["ats_feedback"].get("score", "") if state["ats_feedback"] else "",
-                    "previous_summary": state["ats_feedback"].get("summary", "") if state["ats_feedback"] else "",
-                }
+            invoke_input = {
+                "required_skills": state["jd_structured"].get("required_skills", []),
+                "preferred_skills": state["jd_structured"].get("preferred_skills", []),
+                "experience_requirements": state["jd_structured"].get("experience_requirements", []),
+                "education_requirements": state["jd_structured"].get("education_requirements", []),
+                "key_responsibilities": state["jd_structured"].get("key_responsibilities", []),
+                "company_info": state["jd_structured"].get("company_info", {}),
+                "resume": state["current_resume"],
+                "previous_score": state["ats_feedback"].get("score", "") if state["ats_feedback"] else "",
+                "previous_summary": state["ats_feedback"].get("summary", "") if state["ats_feedback"] else "",
+            }
+            feedback_obj = invoke_with_retry(
+                lambda: chain.invoke(invoke_input),
+                label="score",
             )
             feedback = feedback_obj.model_dump()
 
