@@ -3,9 +3,8 @@
 from unittest.mock import MagicMock
 
 import pytest
-from langchain_core.exceptions import OutputParserException
-
 from app.llm_retry import invoke_with_retry
+from langchain_core.exceptions import OutputParserException
 
 
 class _Counter:

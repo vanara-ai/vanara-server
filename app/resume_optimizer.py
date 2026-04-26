@@ -14,8 +14,8 @@ from langgraph.graph import END, StateGraph
 from langgraph.pregel import RetryPolicy
 from langgraph.types import CachePolicy
 
-from .logger import logger
 from .llm_retry import invoke_with_retry
+from .logger import logger
 from .models import JD, ATSScoreOutput, Resume
 
 # Configuration — all models hosted on Groq (single-provider BYOK).

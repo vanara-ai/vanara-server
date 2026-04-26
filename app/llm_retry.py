@@ -9,7 +9,8 @@ bad input) propagate immediately.
 from __future__ import annotations
 
 import time
-from typing import Callable, Iterable, TypeVar
+from collections.abc import Callable, Iterable
+from typing import TypeVar
 
 from langchain_core.exceptions import OutputParserException
 
