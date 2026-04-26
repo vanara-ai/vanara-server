@@ -14,7 +14,7 @@ LLM agents cooperate under a [LangGraph](https://langchain-ai.github.io/langgrap
 orchestrator, all backed by [Groq](https://groq.com/)-hosted models.
 
 **The frontend lives in a sibling repo:
-[resumeaiui](https://github.com/vanara-ai/vanara-serverui).**
+[vanara-ui](https://github.com/vanara-ai/vanara-ui).**
 
 ## ✨ Why it exists
 

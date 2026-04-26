@@ -6,7 +6,7 @@ If you discover a security issue in Vanara.ai, please **do not** open a public G
 
 Instead, email the maintainer directly:
 
-**sinduku1@depaul.edu**
+**vanara.ai@yahoo.com**
 
 Include:
 - A description of the issue and its potential impact

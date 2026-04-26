@@ -81,4 +81,4 @@ This project follows the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md). By par
 
 ## Questions?
 
-Open an issue with the `question` label, or email sinduku1@depaul.edu.
+Open an issue with the `question` label, or email vanara.ai@yahoo.com.
