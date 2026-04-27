@@ -25,6 +25,7 @@ from .constants import PDF_SUFFIX
 from .deps import get_groq_key
 from .email_service import EmailService
 from .env import setup_environment
+from .errors import classify_error
 from .logger import logger
 from .logging_utils import safe_headers
 from .models import FeedbackRequest, GeneratePDFRequest, Resume
@@ -188,7 +189,8 @@ async def optimize_resume(
                 "Failed to process resume",
                 extra={"error_message": result["result_text"]},
             )
-            raise HTTPException(status_code=400, detail=result["result_text"])
+            user_err = classify_error(result["result_text"])
+            raise HTTPException(status_code=user_err.status_code, detail=user_err.detail)
 
         logger.info(
             "Resume optimization completed",
@@ -227,14 +229,16 @@ async def optimize_resume(
     except HTTPException:
         raise
     except Exception as e:
+        user_err = classify_error(e)
         logger.exception(
             "Unexpected error during resume optimization",
             extra={
                 "error_message": str(e),
                 "resume_name": resume_pdf.filename if resume_pdf else None,
+                "error_ref": user_err.request_id,
             },
         )
-        raise HTTPException(status_code=500, detail="Internal server error") from None
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.get("/download/{filename}")
@@ -413,9 +417,10 @@ async def parse_resume_endpoint(
 
     except HTTPException:
         raise
-    except Exception:
-        logger.exception("Error parsing resume")
-        raise HTTPException(status_code=500, detail="Failed to parse resume") from None
+    except Exception as e:
+        user_err = classify_error(e)
+        logger.exception("Error parsing resume", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.get("/parsed-resumes/")
