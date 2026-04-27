@@ -9,7 +9,7 @@
 > **Open-source resume optimization. Giving it back to the community.**
 
 A multi-agent FastAPI backend that iteratively rewrites résumés against a target
-job description until it hits an ATS-style score threshold. Five specialised
+job description until it hits an ATS-style score threshold. Six specialised
 LLM agents cooperate under a [LangGraph](https://langchain-ai.github.io/langgraph/)
 orchestrator, all backed by [Groq](https://groq.com/)-hosted models.
 
@@ -56,8 +56,9 @@ to the settings modal in the frontend.
                                │       └────────┘  (< 90)    │
                                │           │                 │
                                │           ▼                 │
-                               │    orchestrate ─▶ 5 agents  │
+                               │    orchestrate ─▶ 6 agents  │
                                │      summary / skills /     │
+                               │      certifications /       │
                                │      experience / projects /│
                                │      education              │
                                └──────────────┬──────────────┘
@@ -89,10 +90,10 @@ to the settings modal in the frontend.
 ```bash
 # 1. clone
 git clone https://github.com/vanara-ai/vanara-server.git
-cd resumeai
+cd vanara-server
 
 # 2. install
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate  # Unix shell
 pip install -r requirements.txt
 
 # 3. configure (all envs optional; .env.example has details)
@@ -111,6 +112,21 @@ Or with Docker:
 docker compose up --build
 ```
 
+For the end-user flow `vanara-server` and `vanara-ui` must run alongside
+each other — this repo is just the API. With the backend up on `:8000`,
+clone and start the [sibling repo](https://github.com/vanara-ai/vanara-ui):
+
+```bash
+git clone https://github.com/vanara-ai/vanara-ui.git
+cd vanara-ui
+npm install
+npm run dev
+```
+
+The UI defaults to `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000`, so
+it picks up this backend automatically. See its README for env vars and
+optional Supabase setup.
+
 ## 🧪 Tests
 
 ```bash
@@ -118,11 +134,12 @@ pip install -r requirements-dev.txt
 pytest tests/ -v
 ```
 
-51 unit tests covering:
+64 unit tests covering:
 - **BYOK contract**: 401 without key, blank-key rejection, stateless history → 501, `/health` open
 - **PDF Unicode sanitizer**: em-dashes, smart quotes, bullets, control chars, nested payloads
 - **Pydantic schemas**: resume validation, environment/tech-stack line filtering in experience bullets
 - **Auth helpers**: `get_groq_key` header enforcement
+- **LLM retry helper**: retryable vs non-retryable error classification, exponential backoff
 
 With coverage:
 ```bash
@@ -143,6 +160,7 @@ app/
 ├── resume_parser.py      # Standalone ResumeParser used by /parse-resume
 ├── optimized_pipeline.py # PDF text → optimize → render orchestration
 ├── pdf_utils.py          # xhtml2pdf / Jinja2 PDF rendering
+├── llm_retry.py          # Retry helper for transient LLM errors (backoff)
 ├── models.py             # Pydantic schemas (Resume, ATSScoreOutput, etc.)
 ├── cloud_taxonomy.py     # Role-level cloud-provider detection
 ├── database.py           # Optional Supabase persistence layer
@@ -150,8 +168,8 @@ app/
 ├── logger.py             # JSON-ish structured logger
 ├── constants.py          # PDF_SUFFIX, TEMPLATE_DIR
 └── env.py                # load .env
-templates/                # 8 HTML resume templates (Jinja2)
-tests/                    # pytest suite (BYOK, sanitizer, schemas, auth helpers)
+templates/                # 2 HTML resume templates (Jinja2)
+tests/                    # pytest suite (BYOK, sanitizer, schemas, auth helpers, llm retry)
 ```
 
 ## 🔐 Security

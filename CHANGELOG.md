@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial public release of Vanara.ai backend
 - BYOK (Bring Your Own Key) architecture: Groq API key forwarded per-request via `X-Groq-Key` header, never persisted
-- 5-agent resume optimization pipeline (planner, skills, experience, projects, scorer) built on LangGraph
+- 6-agent resume optimization pipeline (summary, skills, certifications, professional_experience, education, projects) coordinated under a parse → score → rewrite LangGraph state machine
 - `/optimize_resume/`: end-to-end PDF upload → optimized PDF
 - `/parse-resume/`: PDF → structured JSON (no LLM spend)
 - `/optimize-from-parsed/`: optimize from cached parsed resume (Smart Library)
