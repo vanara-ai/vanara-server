@@ -1,6 +1,6 @@
 # Vanara.ai Backend: Architecture
 
-This document describes how requests flow through the backend and how the 5-agent
+This document describes how requests flow through the backend and how the 6-agent
 optimization pipeline is structured. It complements `README.md` (which focuses
 on setup and deployment).
 
@@ -31,28 +31,51 @@ flowchart LR
    description, and headers: `X-Groq-Key`, optionally `X-User-*`.
 2. **`deps.py`** extracts the Groq key and user identity headers via FastAPI
    dependencies. The key is never written to a file or database.
-3. **`resume_parser.py`** extracts text from the PDF (PyMuPDF / PyPDF2) and
+3. **`resume_parser.py`** extracts text from the PDF (PyPDF2) and
    chunks it into logical sections.
 4. **`resume_optimizer.py`** runs a LangGraph state machine:
 
 ```mermaid
 flowchart TD
-    Start([Start]) --> Planner[Planner agent\nsection plan]
-    Planner --> Summary[Summary agent]
-    Planner --> Skills[Skills agent]
-    Planner --> Experience[Experience agent]
-    Planner --> Projects[Projects agent]
-    Summary --> Merge[Merge sections]
-    Skills --> Merge
-    Experience --> Merge
-    Projects --> Merge
-    Merge --> Scorer[ATS scorer agent]
-    Scorer --> Decision{score ≥ target\nOR iter ≥ max?}
-    Decision -- no --> Planner
+    Start([Request]) --> Parser[Parser agent<br/>parse_resume]
+    Parser --> JDParser[JD parser agent<br/>parse_jd]
+    JDParser --> Scorer[Scorer agent — ATS judge<br/>score_resume]
+    Scorer --> Decision{score ≥ 90<br/>OR iter ≥ max?}
     Decision -- yes --> Render[Render HTML template]
+    Decision -- no --> Rewriter[Rewriter agent — orchestrator<br/>rewrite_resume]
+    Rewriter --> Scorer
     Render --> PDF[xhtml2pdf → PDF bytes]
     PDF --> End([Response])
+
+    subgraph Specialists [6 specialist agents — run in parallel]
+        direction LR
+        S1[summary]
+        S2[skills]
+        S3[certifications]
+        S4[professional<br/>experience]
+        S5[education]
+        S6[projects]
+    end
+
+    Rewriter -.->|fan-out via<br/>ThreadPoolExecutor| Specialists
+
+    classDef agent fill:#e0e7ff,stroke:#6366f1,stroke-width:2px
+    class Parser,JDParser,Scorer,Rewriter,S1,S2,S3,S4,S5,S6 agent
 ```
+
+Each LangGraph node above is an LLM agent driving Groq via
+`ChatOpenAI`. **Parser** and **JD parser** turn unstructured input
+into typed JSON; the **Scorer** acts as ATS judge, emitting a score
+plus actionable feedback and deciding whether the loop continues;
+the **Rewriter** orchestrates 6 **section specialists** (summary,
+skills, certifications, professional_experience, education,
+projects) that run as parallel Python tasks via `ThreadPoolExecutor`.
+They're not separate LangGraph nodes, but they're real per-section
+LLM agents — each registered with its own prompt in
+`SECTION_AGENT_PROMPTS` in `resume_optimizer.py`. The
+Scorer→Rewriter→Scorer cycle is the core agentic refinement loop:
+iterate until the resume crosses `TARGET_SCORE = 90` or hits the
+max-iterations cap.
 
 5. **`pdf_utils.py`** renders the Jinja2 template (`resume_template_7.html`
    or `resume_template_10.html`), sanitizes Unicode, and hands the HTML to
@@ -75,12 +98,14 @@ flowchart TD
   are unset. `/optimize_resume/` returns the PDF bytes directly.
 - When configured, the same endpoints transparently persist history,
   parsed resumes, and feedback. The client detects the mode via the
-  `supabaseEnabled` flag.
+  `persistence` field on the `/health` response (`"enabled"` or
+  `"stateless"`).
 
 ### Rate limiting
 - Not enforced at the backend level; we expect self-hosted deployments to
-  front-end with nginx / Cloudflare / Render's built-in limits. See H1 in
-  the audit report for public-deploy guidance (`slowapi`).
+  front-end with nginx / Cloudflare / Render's built-in limits. If you
+  need in-process rate limiting (rather than relying on a reverse proxy),
+  consider [`slowapi`](https://slowapi.readthedocs.io/).
 
 ### PDF pipeline
 - **xhtml2pdf** (pure Python, no native deps) over WeasyPrint (needs
@@ -100,8 +125,9 @@ flowchart TD
 | `logging_utils.py` | Allow-list redactor |
 | `models.py` | Pydantic models (resume, sections, scoring) |
 | `resume_parser.py` | PDF → structured resume JSON |
-| `resume_optimizer.py` | 5-agent LangGraph pipeline |
-| `optimized_pipeline.py` | Single-call optimized flow (fewer tokens) |
+| `resume_optimizer.py` | 6-agent LangGraph pipeline |
+| `optimized_pipeline.py` | PDF text → optimize → render orchestration |
+| `llm_retry.py` | Retry helper for transient LLM errors (exponential backoff) |
 | `cloud_taxonomy.py` | AWS / GCP / Azure service vocabulary for ATS matching |
 | `pdf_utils.py` | HTML rendering + `xhtml2pdf` glue |
 | `database.py` | Supabase persistence (optional) |

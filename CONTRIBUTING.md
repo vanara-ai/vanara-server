@@ -15,7 +15,7 @@ PR. If you've done this before, skip to [Pull Request Process](#pull-request-pro
 
 ```bash
 git clone https://github.com/vanara-ai/vanara-server.git
-cd resumeai
+cd vanara-server
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
@@ -38,7 +38,7 @@ ruff format --check app/ tests/            # format check
 - **Feature requests**: open a GitHub issue using the feature request template
 - **Code**: see "Pull Request Process" below
 - **Docs**: typo fixes, clearer explanations, more examples, all welcome
-- **New agents/tools**: the pipeline is plugin-friendly. Add a new specialized agent in `app/agents/` and wire it in `optimized_pipeline.py`
+- **New agents/tools**: agents are methods on `ResumeOptimizer` in `app/resume_optimizer.py`. Add a `_get_<name>_agent_prompt()` method and register it in the `SECTION_AGENT_PROMPTS` dict
 
 ## Pull Request Process
 
