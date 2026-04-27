@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 
 from .logger import logger
 from .models import Resume
-from .pdf_utils import extract_pdf_text_with_pypdf2
+from .pdf_utils import extract_pdf_text
 
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 PARSE_MODEL = "openai/gpt-oss-20b"
@@ -29,7 +29,7 @@ class ResumeParser:
 
     async def parse_resume(self, resume_path: str) -> Resume:
         try:
-            resume_text = extract_pdf_text_with_pypdf2(resume_path)
+            resume_text = extract_pdf_text(resume_path)
 
             logger.info(
                 "PDF text extracted",

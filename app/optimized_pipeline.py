@@ -9,7 +9,7 @@ from .env import setup_environment
 from .logger import logger
 from .pdf_utils import (
     _sanitize_pdf_payload,
-    extract_pdf_text_with_pypdf2,
+    extract_pdf_text,
     html_to_pdf,
     render_resume_to_html,
 )
@@ -41,7 +41,7 @@ async def process_resume_and_jobdesc(pipeline, resume_path, jobdesc_text, resume
         )
 
         logger.info("Extracting text from PDF", extra={"resume_path": resume_path})
-        resume_text = extract_pdf_text_with_pypdf2(resume_path)
+        resume_text = extract_pdf_text(resume_path)
 
         result = await pipeline.optimize(resume_text, jobdesc_text)
         original_resume = result["parsed_resume"]

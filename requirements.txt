@@ -12,6 +12,7 @@ langgraph==0.4.7
 # PDF rendering (pure-Python, no native deps)
 xhtml2pdf==0.2.11
 PyPDF2==3.0.1
+PyMuPDF==1.27.2.3
 jinja2==3.1.6
 
 # Data / validation

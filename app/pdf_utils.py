@@ -1,7 +1,10 @@
 import contextlib
+import logging
 
 import PyPDF2
 from jinja2 import Environment, FileSystemLoader
+
+logger = logging.getLogger(__name__)
 
 
 def extract_pdf_hyperlinks(pdf_path: str):
@@ -37,6 +40,44 @@ def extract_pdf_text_with_pypdf2(pdf_path: str) -> str:
         text += "\n\nHyperlinks found in the document:\n"
         for link in links:
             text += f"- Page {link['page']}: {link['uri']}\n"
+    return text
+
+
+def _extraction_looks_broken(text: str) -> bool:
+    """Detect when PyPDF2 fails to extract spaces (certain font encodings).
+
+    Normal resumes have ~12% spaces. Broken extraction drops below 1%.
+    Threshold of 3% gives a wide safety margin.
+    """
+    if not text or len(text.strip()) < 100:
+        return True
+    space_pct = text.count(" ") / len(text) * 100
+    return space_pct < 3.0
+
+
+def _extract_pdf_text_with_pymupdf(pdf_path: str) -> str:
+    """Fallback extractor using pymupdf (handles font encodings PyPDF2 can't)."""
+    import fitz
+
+    doc = fitz.open(pdf_path)
+    text = "\n".join(page.get_text() for page in doc)
+    doc.close()
+    return text
+
+
+def extract_pdf_text(pdf_path: str) -> str:
+    """Extract text from PDF, with automatic fallback.
+
+    Uses PyPDF2 as primary extractor. If the output looks broken (e.g. no
+    spaces due to font encoding issues), falls back to pymupdf.
+    """
+    text = extract_pdf_text_with_pypdf2(pdf_path)
+    if _extraction_looks_broken(text):
+        logger.warning(
+            "PyPDF2 output looks broken (space_pct=%.1f%%), falling back to pymupdf",
+            text.count(" ") / max(len(text), 1) * 100,
+        )
+        text = _extract_pdf_text_with_pymupdf(pdf_path)
     return text
 
 
