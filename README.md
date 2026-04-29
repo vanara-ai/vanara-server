@@ -134,7 +134,7 @@ pip install -r requirements-dev.txt
 pytest tests/ -v
 ```
 
-64 unit tests covering:
+Unit tests covering:
 - **BYOK contract**: 401 without key, blank-key rejection, stateless history → 501, `/health` open
 - **PDF Unicode sanitizer**: em-dashes, smart quotes, bullets, control chars, nested payloads
 - **Pydantic schemas**: resume validation, environment/tech-stack line filtering in experience bullets
