@@ -286,8 +286,9 @@ async def get_resume_history(
             user_id, page, limit, company, min_score, max_score, start_date, end_date
         )
     except Exception as e:
-        logger.error("Failed to fetch resume history", extra={"error": str(e)})
-        raise HTTPException(status_code=500, detail="Failed to fetch resume history") from None
+        user_err = classify_error(e)
+        logger.exception("Failed to fetch resume history", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.post("/generate-pdf")
@@ -310,8 +311,9 @@ async def generate_pdf_from_history(pdf_request: GeneratePDFRequest, request: Re
     except HTTPException:
         raise
     except Exception as e:
-        logger.error("Failed to generate PDF", extra={"error": str(e)})
-        raise HTTPException(status_code=500, detail="Failed to generate PDF") from None
+        user_err = classify_error(e)
+        logger.exception("Failed to generate PDF", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.post("/feedback")
@@ -351,8 +353,9 @@ async def submit_feedback(feedback: FeedbackRequest, request: Request):
 
         return {"success": True, "message": "Thank you for your feedback!"}
     except Exception as e:
-        logger.error("Failed to process feedback", extra={"error": str(e)})
-        raise HTTPException(status_code=500, detail="Failed to process feedback") from None
+        user_err = classify_error(e)
+        logger.exception("Failed to process feedback", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.post("/parse-resume/")
@@ -434,8 +437,9 @@ async def get_parsed_resumes(request: Request):
         resumes = await db.get_user_parsed_resumes(user_id)
         return {"parsed_resumes": resumes}
     except Exception as e:
-        logger.error("Failed to fetch parsed resumes", extra={"error": str(e)})
-        raise HTTPException(status_code=500, detail="Failed to fetch parsed resumes") from None
+        user_err = classify_error(e)
+        logger.exception("Failed to fetch parsed resumes", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.delete("/parsed-resumes/{resume_id}")
@@ -453,8 +457,9 @@ async def delete_parsed_resume(resume_id: str, request: Request):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error("Failed to delete parsed resume", extra={"error": str(e)})
-        raise HTTPException(status_code=500, detail="Failed to delete parsed resume") from None
+        user_err = classify_error(e)
+        logger.exception("Failed to delete parsed resume", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.post("/optimize-from-parsed/")
@@ -509,9 +514,13 @@ async def optimize_from_parsed(
         }
     except HTTPException:
         raise
-    except Exception:
-        logger.exception("Error optimizing from parsed resume")
-        raise HTTPException(status_code=500, detail="Failed to optimize resume") from None
+    except Exception as e:
+        user_err = classify_error(e)
+        logger.exception(
+            "Error optimizing from parsed resume",
+            extra={"error_ref": user_err.request_id},
+        )
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 @app.get("/analytics/requests")
@@ -541,8 +550,9 @@ async def get_request_analytics(
         count = response.count if hasattr(response, "count") else None
         return {"data": data, "count": count}
     except Exception as e:
-        logger.error("Failed to fetch analytics", extra={"error_message": str(e)})
-        raise HTTPException(status_code=500, detail="Failed to fetch analytics") from None
+        user_err = classify_error(e)
+        logger.exception("Failed to fetch analytics", extra={"error_ref": user_err.request_id})
+        raise HTTPException(status_code=user_err.status_code, detail=user_err.detail) from None
 
 
 if __name__ == "__main__":
