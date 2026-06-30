@@ -8,6 +8,9 @@ python-multipart==0.0.20
 langchain-core==0.3.61
 langchain-openai==0.3.18
 langgraph==0.4.7
+# Pin transitive checkpoint lib: langgraph 0.4.7 + langchain-core 0.3.61
+# break on checkpoint>=2.1 (Reviver(allowed_objects=...) TypeError at import).
+langgraph-checkpoint<2.1
 
 # PDF rendering (pure-Python, no native deps)
 xhtml2pdf==0.2.11
