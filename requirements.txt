@@ -1,6 +1,6 @@
 # Core web framework
-fastapi==0.115.12
-uvicorn==0.34.2
+fastapi==0.139.0
+uvicorn==0.50.1
 python-multipart==0.0.20
 
 # LLM / agent stack (all providers reachable through the OpenAI-compatible
@@ -19,7 +19,7 @@ PyMuPDF==1.27.2.3
 jinja2==3.1.6
 
 # Data / validation
-pydantic[email]==2.11.4
+pydantic[email]==2.13.4
 python-dateutil==2.9.0.post0
 deepdiff==8.5.0
 
