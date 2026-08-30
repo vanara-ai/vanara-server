@@ -21,7 +21,7 @@ jinja2==3.1.6
 # Data / validation
 pydantic[email]==2.11.4
 python-dateutil==2.9.0.post0
-deepdiff==8.5.0
+deepdiff==9.0.0
 
 # Optional: Supabase-backed persistence (history + feedback). If the
 # SUPABASE_URL / SUPABASE_KEY env vars are unset the backend runs
